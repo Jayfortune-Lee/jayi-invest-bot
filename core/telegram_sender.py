@@ -1,1 +1,11 @@
 # Telegram 메시지 전송 공통 모듈
+import requests
+
+def send_message(token, chat_id, text):
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": "HTML"
+    }
+    requests.post(url, json=payload)
