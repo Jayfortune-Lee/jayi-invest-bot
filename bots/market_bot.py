@@ -1,7 +1,7 @@
 import sys
 import os
 
-# 루트 기준 import
+# 루트 기준으로 경로 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.macro import get_macro_message
