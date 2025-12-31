@@ -8,7 +8,6 @@ on:
 jobs:
   run-market-bot:
     runs-on: ubuntu-22.04
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
