@@ -1,7 +1,7 @@
 import sys
 import os
 
-# 루트 경로를 sys.path에 추가
+# 루트 기준 import
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.auction import get_auction_message
