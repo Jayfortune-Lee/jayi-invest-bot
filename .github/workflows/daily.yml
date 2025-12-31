@@ -2,15 +2,15 @@ name: Jayi Daily Bots
 
 on:
   schedule:
-    - cron: '0 21 * * *' # 한국 시간(KST) 오전 6시 실행
-  workflow_dispatch: # 수동 실행 버튼
+    - cron: '0 21 * * *' # KST 06:00
+  workflow_dispatch:
 
 jobs:
   run-bots:
     runs-on: ubuntu-latest
     env:
-      # 이 한 줄이 ModuleNotFoundError를 해결하는 핵심입니다!
-      PYTHONPATH: .
+      # 루트 디렉토리를 파이썬 경로에 추가
+      PYTHONPATH: ${{ github.workspace }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       TG_ID: ${{ secrets.TG_ID }}
       TG_TOKEN_MARKET: ${{ secrets.TG_TOKEN_MARKET }}
@@ -33,10 +33,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Business Bot
-        run: python bots/business_bot.py
+        run: python -m bots.business_bot
 
       - name: Run Wealth Bot
-        run: python bots/wealth_bot.py
+        run: python -m bots.wealth_bot
 
       - name: Run Auction Bot
-        run: python bots/auction_bot.py
+        run: python -m bots.auction_bot
