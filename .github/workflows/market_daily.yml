@@ -1,32 +1,29 @@
-name: Market Jayi Bot Daily
+name: Market Jayi Bot Test
 
 on:
-  schedule:
-    - cron: '0 7 * * *'  # 매일 오전 7시 실행 (UTC)
-  workflow_dispatch:
-
+  workflow_dispatch:   # 수동 실행만 테스트
 jobs:
-  run-market-bot:
-    runs-on: ubuntu-22.04  # 여기 변경
+  test-market-bot:
+    runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.10.13  # 명시적 최신 안정버전
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.13
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-- name: Run Market Bot
-  env:
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-    TG_TOKEN_MARKET: ${{ secrets.TG_TOKEN_MARKET }}
-    TG_ID: ${{ secrets.TG_ID }}
-    PYTHONPATH: ${{ github.workspace }}
-  run: python bots/market_bot.py
+      - name: Run Market Bot
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TG_TOKEN_MARKET: ${{ secrets.TG_TOKEN_MARKET }}
+          TG_ID: ${{ secrets.TG_ID }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: python -m bots.market_bot
