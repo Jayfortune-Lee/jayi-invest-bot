@@ -1,17 +1,17 @@
 import os
 from core.macro import auto_as_macro_prompt
-from core.portfolio import get_portfolio_message
+from core.portfolio import auto_portfolio_brief
 from telegram_sender import send_telegram_message
 
 def run_market_bot():
-    as_briefing = auto_as_macro_prompt()
-    portfolio_msg = get_portfolio_message()
-    final_message = f"📅 오늘의 전략 브리핑\n━━━━━━━━━━━━━━━━━━\n{as_briefing}\n━━━━━━━━━━━━━━━━━━\n{portfolio_msg}\n━━━━━━━━━━━━━━━━━━"
-
+    macro_msg = auto_as_macro_prompt()      # 글로벌 자동차/AS 분석
+    portfolio_msg = auto_portfolio_brief() # 주식 포트폴리오 전략
+    full_msg = f"{macro_msg}\n\n{portfolio_msg}"
+    
     send_telegram_message(
-        final_message,
+        full_msg,
         token=os.environ["TG_TOKEN_MARKET"],
-        chat_id=os.environ["TG_ID"]
+        chat_id=os.environ["TG_ID_MARKET"]
     )
 
 if __name__ == "__main__":
