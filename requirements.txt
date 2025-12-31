@@ -1,6 +1,7 @@
-openai>=1.0.0
-requests
+gspread
+google-auth
 yfinance
+openai
+python-telegram-bot
+requests
 beautifulsoup4
-pandas
-lxml
