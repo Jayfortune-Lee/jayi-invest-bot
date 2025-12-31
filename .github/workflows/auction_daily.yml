@@ -1,24 +1,19 @@
 name: Auction Bot Daily
 on:
   schedule:
-    - cron: "0 21 * * *" # 한국 시간 오전 6시
+    - cron: "0 21 * * *"
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: "3.10"
-
     - name: Install dependencies
       run: pip install -r requirements.txt
-
     - name: Run Auction Bot
       run: python -m bots.auction_bot
       env:
