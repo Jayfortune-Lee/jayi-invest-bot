@@ -5,6 +5,7 @@ def send_telegram_message(message, token, chat_id):
     payload = {
         "chat_id": chat_id,
         "text": message,
-        "parse_mode": "Markdown"
+        "parse_mode": "Markdown",
+        "disable_web_page_preview": False
     }
     requests.post(url, data=payload)
