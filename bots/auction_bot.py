@@ -4,16 +4,26 @@ from core.analyzer import ask_gpt
 from telegram import Bot
 
 async def main():
-    # 1. 타겟 매물 데이터 (실제 서비스 연동 전, 현재 수익성 높은 표본 매물 설정)
-    # 추후 크롤러가 완성되면 이 변수에 실시간 데이터가 들어갑니다.
+    # 1. 샘플 매물 데이터 (서울 주요 지역 사례)
+    # 실제 운영 시에는 이 리스트에 여러 매물을 넣을 수 있습니다.
     auction_items = [
         {
             "case_no": "2023타경108XXX",
-            "location": "서울시 송파구 가락동 XXX 아파트",
-            "appraisal_value": 1500000000, # 감정가 15억
-            "min_bid_price": 1200000000,   # 최저가 12억 (1회 유찰)
+            "location": "서울시 송파구 가락동 가락금호 84㎡",
+            "appraisal_value": 1500000000, 
+            "min_bid_price": 1200000000,   
             "status": "유찰 1회",
-            "market_price": 1450000000     # 인근 실거래가 약 14.5억
+            "market_price": 1420000000,
+            "is_occupied_by_owner": True   # 소유자 거주 여부 등 특이사항
+        },
+        {
+            "case_no": "2024타경205XXX",
+            "location": "서울시 노원구 상계동 상계주공 59㎡",
+            "appraisal_value": 700000000, 
+            "min_bid_price": 448000000,   
+            "status": "유찰 2회",
+            "market_price": 620000000,
+            "is_occupied_by_owner": False
         }
     ]
 
@@ -25,17 +35,18 @@ async def main():
                        f"  최저가: {item['min_bid_price']:,.0f}원 ({item['status']})\n"
                        f"  인근시세: {item['market_price']:,.0f}원\n\n")
 
-    # 2. GPT에게 '돈'을 기준으로 분석 요청
-    role = "당신은 100억 자산가이자 대한민국 최고의 경매 컨설턴트입니다. 오직 경락 잔금 대출 효율과 시세 차익(Margin)만 봅니다."
+    # 2. GPT에게 투자/실거주 구분 및 수익 분석 요청
+    role = "당신은 경매 경력 20년의 실전 부동산 전문가입니다. 모든 매물을 '투자용'과 '실거주용'으로 명확히 구분하여 가치를 평가합니다."
     
     prompt = f"""
-    [오늘의 서울 아파트 경매 분석 대상]
+    [서울 아파트 경매 매물 분석]
     {items_text}
     
-    [분석 지시]
-    1. 위 매물 중 가장 '돈이 되는' 매물을 선정하고 이유를 시세 차익 위주로 설명하세요.
-    2. 권리분석 시 주의해야 할 점(대항력 있는 임차인, 인수 금액 등)을 냉정하게 지적하세요.
-    3. 인근 실거래가 대비 몇 % 수준에서 입찰해야 수익이 극대화될지 구체적인 '입찰 추천가'를 제시하세요.
+    [분석 요청]
+    1. 각 매물에 대해 **[투자용]** 또는 **[실거주용]** 딱지를 붙여주세요. (둘 다 해당되면 이유 설명)
+    2. **투자용**인 경우: 전세가율과 시세 차익(Margin)을 바탕으로 한 단기 수익성 분석.
+    3. **실거주용**인 경우: 입지, 학군, 실거주 편의성 및 경매를 통해 급매보다 싸게 사는 전략 분석.
+    4. 각 매물별 '절대 놓치지 말아야 할 적정 입찰가'를 숫자로 제시하세요.
     """
     
     analysis = ask_gpt(prompt, system_role=role)
@@ -44,7 +55,7 @@ async def main():
     bot = Bot(token=os.getenv("TG_TOKEN_AUCTION"))
     await bot.send_message(
         chat_id=os.getenv("TG_ID"), 
-        text=f"🏠 **Auction Jayi: 경매 수익 분석**\n\n{analysis}", 
+        text=f"🏠 **Auction Jayi: 실전 경매 브리핑**\n\n{analysis}", 
         parse_mode="Markdown"
     )
 
