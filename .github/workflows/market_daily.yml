@@ -23,9 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Market Bot
-      env:
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        TG_TOKEN_MARKET: ${{ secrets.TG_TOKEN_MARKET }}
-        TG_ID: ${{ secrets.TG_ID }}
-      run: python bots/market_bot.py
+- name: Run Market Bot
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    TG_TOKEN_MARKET: ${{ secrets.TG_TOKEN_MARKET }}
+    TG_ID: ${{ secrets.TG_ID }}
+    PYTHONPATH: ${{ github.workspace }}
+  run: python bots/market_bot.py
