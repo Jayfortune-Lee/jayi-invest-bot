@@ -1,11 +1,11 @@
 import sys
 import os
 
-# 루트 기준으로 경로 추가
+# 루트를 Python 모듈 경로에 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.auction import get_auction_message
-from telegram_sender import send_telegram_message
+from telegram_sender import send_telegram_message  # 루트에서 import
 
 def run_auction_bot():
     msg = get_auction_message()
