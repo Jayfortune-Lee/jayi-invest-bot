@@ -1,34 +1,23 @@
 import requests
+from bs4 import BeautifulSoup
 
-TARGET_DISTRICTS = ["강남구","서초구","동작구","용산구","송파구","성동구","광진구"]
+def fetch_seoul_auction():
+    url = "https://www.courtauction.go.kr/common/bidder/auctionList.do"
+    res = requests.get(url)
+    soup = BeautifulSoup(res.text, "lxml")
+    
+    # 실제로는 태그 구조 확인 후 필터링
+    apartments = []
+    for item in soup.select(".auction-item"):
+        name = item.select_one(".apt-name").text
+        size = float(item.select_one(".apt-size").text.replace("㎡",""))
+        price = int(item.select_one(".current-price").text.replace(",",""))
+        rights = item.select_one(".rights-info").text
+        if size >= 84 and price <= 1500000000:
+            apartments.append({"address": name, "current_price": price, "rights_issues": rights})
+    return apartments
 
-def fetch_auction_listings():
-    """
-    가상의 API 예시
-    실제로는 법원경매, 부동산 공공 API 연동
-    """
-    listings = []
-    for district in TARGET_DISTRICTS:
-        # 예시 데이터
-        listings.append({
-            "district": district,
-            "apt_name": f"{district} 아파트 예시",
-            "size": 84,
-            "price": 12_500_000_000,
-            "link": "https://example.com/auction",
-            "rights_issue": "명도권 문제 없음",
-            "safety": "상대적 안전"
-        })
-    return listings
-
-def generate_auction_brief():
-    listings = fetch_auction_listings()
-    summary = ""
-    for apt in listings:
-        bid_price = int(apt["price"] * 0.88)
-        summary += (f"{apt['district']} {apt['apt_name']} ({apt['size']}㎡) "
-                    f"권리분석: {apt['rights_issue']}, "
-                    f"안전성: {apt['safety']}, "
-                    f"예상 입찰가: {bid_price:,}원\n"
-                    f"링크: {apt['link']}\n\n")
-    return summary
+def analyze_auction(apartment):
+    suggested_bid = apartment["current_price"] * 0.88
+    safety_note = "상대적으로 안전" if "권리분석 문제 없음" in apartment["rights_issues"] else "리스크 있음"
+    return f"{apartment['address']} | 권리분석: {apartment['rights_issues']} | 추천입찰가: {suggested_bid:,.0f}원 | {safety_note}"
