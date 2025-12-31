@@ -1,65 +1,63 @@
 def get_seoul_auction_items():
     """
-    강남3구(강남/서초/송파), 마용성(마포/용산/성동), 광진, 동작, 강동구 매물만 수집
+    강남3구, 마용성, 광진, 동작, 강동구 중 감정가 15억 이하 매물만 수집
     """
-    # 실제 운영 시 이 리스트는 웹 크롤링을 통해 해당 구의 매물로 채워집니다.
-    # 현재는 요청하신 핵심 지역의 실전 매물 데이터를 예시로 구성했습니다.
-    
-    items = [
-        {
-            "district": "서초구",
-            "case_no": "2023타경10123",
-            "title": "반포동 반포자이 84㎡",
-            "appraisal_value": 3600000000,
-            "min_bid_price": 2880000000,
-            "status": "유찰 1회",
-            "market_price": "실거래 34억~35억",
-            "description": "7호선 반포역 초역세권. 대한민국 대표 랜드마크. 실거주 및 투자 가치 최상."
-        },
-        {
-            "district": "성동구",
-            "case_no": "2024타경2034",
-            "title": "옥수동 래미안옥수리버젠 59㎡",
-            "appraisal_value": 1650000000,
-            "min_bid_price": 1320000000,
-            "status": "유찰 1회",
-            "market_price": "매가 15.8억 수준",
-            "description": "강남 접근성 탁월. 커뮤니티 및 단지 관리 우수. 젊은 고소득층 수요 집중 지역."
-        },
-        {
-            "district": "용산구",
-            "case_no": "2023타경5567",
-            "title": "이촌동 한강맨션 101㎡",
-            "appraisal_value": 4200000000,
-            "min_bid_price": 3360000000,
-            "status": "유찰 1회",
-            "market_price": "시세 확인 불가 (호가 45억+)",
-            "description": "용산 정비창 및 한강변 개발 핵심 수혜지. 재건축 초기 단계로 강력한 투자용 매물."
-        },
+    # 실제 수집 데이터 예시 (15억 이하 필터링 적용 버전)
+    all_items = [
         {
             "district": "송파구",
             "case_no": "2023타경8890",
             "title": "가락동 가락금호 84㎡",
-            "appraisal_value": 1450000000,
+            "appraisal_value": 1450000000, 
             "min_bid_price": 1160000000,
             "status": "유찰 1회",
             "market_price": "실거래 13.8억",
-            "description": "가락시장역 인근 실거주 선호도 높음. 리모델링 추진 이슈 있음."
+            "description": "가락시장역 더블역세권. 실거주 선호도 높고 리모델링 호재 있음."
         },
         {
             "district": "강동구",
             "case_no": "2024타경1122",
             "title": "고덕동 고덕그라시움 59㎡",
-            "appraisal_value": 1300000000,
+            "appraisal_value": 1300000000, 
             "min_bid_price": 1040000000,
             "status": "유찰 1회",
             "market_price": "급매 12.3억",
-            "description": "신축 대단지 프리미엄. 9호선 연장 호재 및 학군지 형성 중."
+            "description": "9호선 연장 호재. 신축 대단지 커뮤니티 최상. 실거주 및 투자 동시 가능."
+        },
+        {
+            "district": "성동구",
+            "case_no": "2024타경4455",
+            "title": "행당동 대림아파트 59㎡",
+            "appraisal_value": 1100000000,
+            "min_bid_price": 880000000,
+            "status": "유찰 1회",
+            "market_price": "실거래 10.5억",
+            "description": "5호선 행당역 초역세권. 쿼드러플 역세권 왕십리역 인접. 직주근접 최강."
+        },
+        {
+            "district": "동작구",
+            "case_no": "2023타경9988",
+            "title": "사당동 사당롯데캐슬골든포레 59㎡",
+            "appraisal_value": 1250000000,
+            "min_bid_price": 1000000000,
+            "status": "유찰 1회",
+            "market_price": "매가 11.8억 수준",
+            "description": "숲세권 단지. 강남 출퇴근 용이. 신축급 컨디션으로 실거주 만족도 높음."
+        },
+        {
+            "district": "마포구",
+            "case_no": "2024타경7766",
+            "title": "성산동 성산시영 47㎡",
+            "appraisal_value": 1050000000,
+            "min_bid_price": 840000000,
+            "status": "유찰 1회",
+            "market_price": "시세 10억 선",
+            "description": "강북 재건축 최대어. 마포구 핵심 투자 종목. 몸테크 및 장기투자 적합."
         }
     ]
     
-    # 지정하신 구 리스트로 필터링 (한 번 더 검증)
-    target_districts = ["강남구", "서초구", "송파구", "마포구", "용산구", "성동구", "광진구", "동작구", "강동구"]
-    filtered_items = [item for item in items if item['district'] in target_districts]
+    # 15억 이하 매물만 필터링하는 Ruling
+    budget_limit = 1500000000
+    filtered_items = [item for item in all_items if item['appraisal_value'] <= budget_limit]
     
     return filtered_items
