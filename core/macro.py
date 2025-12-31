@@ -1,21 +1,21 @@
+import requests
+
+NEWS_API_KEY = "YOUR_NEWSAPI_KEY"  # NewsAPI 무료 키 입력
+
+def get_macro_news(keyword, limit=1):
+    url = f"https://newsapi.org/v2/everything?q={keyword}&sortBy=publishedAt&apiKey={NEWS_API_KEY}&pageSize={limit}&language=ko"
+    response = requests.get(url).json()
+    articles = response.get("articles", [])
+    return [(a['title'], a['url']) for a in articles]
+
 def auto_as_macro_prompt():
-    # 실제 API 호출 전용 예시 (OpenAI로 GPT 브리핑 생성)
-    return """
-🚗 글로벌 자동차/AS 시장 (국제 + OEM + AS 수익성)
-1. 지역별 정치·외교 리스크
-- 미국: IRA 영향, 보호무역 강화
-- 중국: 수출통제, 희토류 가격 상승
-- 유럽: 우크라이나 전쟁, 에너지 비용 급등
-- 중동/러시아: 지정학적 분쟁, 원자재 비용 상승
-- 멕시코/동남아: 정치 불안정, 자연재해 및 노동 문제
+    regions = ["미국", "중국", "유럽", "중동", "러시아", "멕시코", "동남아시아"]
+    prompt = "🚗 글로벌 자동차/AS 시장 브리핑\n━━━━━━━━━━━━━━━━━━\n"
 
-2. 공급망 교란
-- 항만 적체, 인력 부족
-- 생산지 재난 및 공장 파업
+    for r in regions:
+        news_list = get_macro_news(f"{r} 자동차 OR AS 부품", limit=1)
+        news_str = " | ".join([f"[{t}]({l})" for t, l in news_list]) if news_list else "관련 뉴스 없음"
+        prompt += f"- {r}: {news_str}\n"
 
-3. OEM 생산·AS 영향
-- 리드타임 지연, 물류비 상승, 긴급 항공 운송 확대
-
-4. AS 수익성 시사점
-- 안전 재고 확보, 지역별 로컬화 강화, 가격 전가 가능성 점검
-"""
+    prompt += "\n공급망, OEM, AS 수익성 관련 시사점 포함"
+    return prompt
