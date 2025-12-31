@@ -1,0 +1,40 @@
+name: Daily Bots
+
+on:
+  schedule:
+    - cron: "0 21 * * *"  # KST 06:00
+  workflow_dispatch:
+
+jobs:
+  run-market-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Market Bot
+        run: python -m bots.market_bot
+        env:
+          TG_TOKEN_MARKET: ${{ secrets.TG_TOKEN_MARKET }}
+          TG_ID_MARKET: ${{ secrets.TG_ID_MARKET }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+  run-auction-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Auction Bot
+        run: python -m bots.auction_bot
+        env:
+          TG_TOKEN_AUCTION: ${{ secrets.TG_TOKEN_AUCTION }}
+          TG_ID_AUCTION: ${{ secrets.TG_ID_AUCTION }}
