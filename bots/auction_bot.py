@@ -1,15 +1,24 @@
-# Auction Jayi Bot (서울 아파트 경매)
-import os
-from core.auction import get_auction_message
-from telegram_sender import send_telegram_message
+name: Auction Jayi Bot Daily
 
-def run_auction_bot():
-    auction_msg = get_auction_message()
-    send_telegram_message(
-        auction_msg,
-        token=os.environ["TG_TOKEN_AUCTION"],
-        chat_id=os.environ["TG_ID"]
-    )
+on:
+  schedule:
+    - cron: '21 21 * * *' # UTC 21시 = KST 06시
+  workflow_dispatch:
 
-if __name__ == "__main__":
-    run_auction_bot()
+jobs:
+  run-auction-bot:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.13
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Auction Bot
+        env:
+          TG_TOKEN_AUCTION: ${{ secrets.TG_TOKEN_AUCTION }}
+          TG_ID: ${{ secrets.TG_ID }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: python -m bots.auction_bot
