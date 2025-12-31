@@ -1,3 +1,14 @@
+import sys
+import os
+
+# 현재 파일(bots/xxx.py)의 부모 폴더(루트)를 파이썬 경로에 추가합니다.
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
+# 그 다음에 기존 import문을 둡니다.
+from core.analyzer import ask_gpt
+# ... 나머지 import 생략
+
+
 import os, asyncio
 import yfinance as yf
 from core.analyzer import ask_gpt
