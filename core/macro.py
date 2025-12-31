@@ -1,21 +1,34 @@
+import openai
+import os
 import requests
+from bs4 import BeautifulSoup
 
-NEWS_API_KEY = "YOUR_NEWSAPI_KEY"  # NewsAPI 무료 키 입력
-
-def get_macro_news(keyword, limit=1):
-    url = f"https://newsapi.org/v2/everything?q={keyword}&sortBy=publishedAt&apiKey={NEWS_API_KEY}&pageSize={limit}&language=ko"
-    response = requests.get(url).json()
-    articles = response.get("articles", [])
-    return [(a['title'], a['url']) for a in articles]
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 def auto_as_macro_prompt():
-    regions = ["미국", "중국", "유럽", "중동", "러시아", "멕시코", "동남아시아"]
-    prompt = "🚗 글로벌 자동차/AS 시장 브리핑\n━━━━━━━━━━━━━━━━━━\n"
-
-    for r in regions:
-        news_list = get_macro_news(f"{r} 자동차 OR AS 부품", limit=1)
-        news_str = " | ".join([f"[{t}]({l})" for t, l in news_list]) if news_list else "관련 뉴스 없음"
-        prompt += f"- {r}: {news_str}\n"
-
-    prompt += "\n공급망, OEM, AS 수익성 관련 시사점 포함"
-    return prompt
+    """
+    글로벌 자동차/AS 시장 뉴스 + 정치/재난/전쟁/공급망 교란 포함
+    """
+    # 예시: Yahoo Finance, Google News 등에서 기사 스크래핑
+    news_urls = [
+        "https://finance.yahoo.com/topic/automotive",
+        "https://www.reuters.com/business/autos/"
+    ]
+    headlines = []
+    for url in news_urls:
+        r = requests.get(url)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for item in soup.select("h3"):
+            text = item.get_text(strip=True)
+            if text:
+                headlines.append(text)
+        if len(headlines) > 10:
+            break
+    
+    prompt = f"다음 글로벌 자동차/AS 관련 뉴스 내용을 전문 투자자 시각으로 요약해줘, 정치·재난·전쟁·공급망 영향 포함:\n{headlines[:10]}"
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+    return "🚗 글로벌 자동차/AS 시장\n" + response.choices[0].message.content
