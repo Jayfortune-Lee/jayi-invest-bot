@@ -1,33 +1,29 @@
-import sys
 import os
-
-# 현재 파일(bots/xxx.py)의 부모 폴더(루트)를 파이썬 경로에 추가합니다.
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-
-# 그 다음에 기존 import문을 둡니다.
-from core.analyzer import ask_gpt
-# ... 나머지 import 생략
-
-
-import os, asyncio, requests
-from bs4 import BeautifulSoup
+import asyncio
 from core.analyzer import ask_gpt
 from telegram import Bot
 
 async def main():
-    # 실제 구현 시에는 특정 경매 포털 URL 크롤링 로직이 들어갑니다.
-    # 여기서는 샘플 데이터로 GPT 권리분석 로직을 구현합니다.
-    sample_auction = "강남구 삼성동 OO아파트, 84㎡, 감정가 18억, 최저가 14.4억, 대항력 있는 임차인 없음"
+    # 분석할 타겟 지역 및 조건
+    target_info = "서울 7개구(강남, 서초 등), 84㎡ 이상, 15억 이하 아파트 경매"
     
+    # 임시 매물 데이터 (추후 크롤링 결과가 이곳에 들어갑니다)
+    sample_item = "사건번호 2023타경102XXX, 서초구 아파트, 감정가 18억, 최저가 14.4억(1회 유찰)"
+
     prompt = f"""
-    [경매 분석 요청] 서울 주요 지역 매물 권리분석
-    - 관심지역: 강남, 서초, 동작, 용산, 송파, 성동, 광진
-    - 물건: {sample_auction}
-    - 권리분석(안전성), 시세 대비 입찰가(88% 기준 보정), 최종 투자 의견을 작성해줘.
+    [경매 매물 분석]
+    관심 조건: {target_info}
+    현재 매물: {sample_item}
+    
+    [분석 내용]
+    1. 권리분석(말소기준권리 등 점검) 결과 안전성 평가.
+    2. 주변 실거래가 대비 최저가 매력도.
+    3. 추천 입찰가 (시세 대비 88% 수준 및 유찰 현황 반영).
     """
+    
     report = ask_gpt(prompt)
     bot = Bot(token=os.getenv("TG_TOKEN_AUCTION"))
-    await bot.send_message(chat_id=os.getenv("TG_ID"), text=f"🏠 **Auction Jayi: 매물 분석**\n\n{report}", parse_mode="Markdown")
+    await bot.send_message(chat_id=os.getenv("TG_ID"), text=f"🏠 **Auction Jayi: 경매 추천 매물**\n\n{report}", parse_mode="Markdown")
 
 if __name__ == "__main__":
     asyncio.run(main())
