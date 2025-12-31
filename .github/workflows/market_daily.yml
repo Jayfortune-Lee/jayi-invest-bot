@@ -1,9 +1,12 @@
-name: Market Jayi Bot Test
+name: Market Jayi Bot Daily
 
 on:
-  workflow_dispatch:   # 수동 실행만 테스트
+  schedule:
+    - cron: '21 21 * * *'  # UTC 기준 → KST 6시 = UTC-9 → 21시 전날
+  workflow_dispatch:      # 수동 실행도 가능
+
 jobs:
-  test-market-bot:
+  run-market-bot:
     runs-on: ubuntu-22.04
 
     steps:
