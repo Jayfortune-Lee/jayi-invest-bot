@@ -1,34 +1,33 @@
 import openai
 import os
 import requests
-from bs4 import BeautifulSoup
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-def auto_as_macro_prompt():
+def fetch_global_car_as_news():
     """
-    글로벌 자동차/AS 시장 뉴스 + 정치/재난/전쟁/공급망 교란 포함
+    실제 뉴스 API 또는 RSS Feed 활용 가능
+    간단 예시로 링크 포함
     """
-    # 예시: Yahoo Finance, Google News 등에서 기사 스크래핑
-    news_urls = [
-        "https://finance.yahoo.com/topic/automotive",
-        "https://www.reuters.com/business/autos/"
+    # 예시 뉴스 링크
+    news_links = [
+        "https://www.autonews.com",
+        "https://www.reuters.com/business/autos-transportation",
+        "https://www.marklines.com/en/statistics"
     ]
-    headlines = []
-    for url in news_urls:
-        r = requests.get(url)
-        soup = BeautifulSoup(r.text, "html.parser")
-        for item in soup.select("h3"):
-            text = item.get_text(strip=True)
-            if text:
-                headlines.append(text)
-        if len(headlines) > 10:
-            break
     
-    prompt = f"다음 글로벌 자동차/AS 관련 뉴스 내용을 전문 투자자 시각으로 요약해줘, 정치·재난·전쟁·공급망 영향 포함:\n{headlines[:10]}"
+    prompt = (
+        "글로벌 자동차/AS 시장 동향을 분석하되, "
+        "각 지역별 정치·외교 리스크, 전쟁/재난/파업 등 공급망 교란, "
+        "OEM 생산과 AS 부품 수익성 시사점을 포함하고, "
+        "주요 뉴스 링크도 같이 제공하라. 최신 데이터 기반."
+    )
+    
+    openai.api_key = OPENAI_API_KEY
     response = openai.ChatCompletion.create(
         model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7
+        messages=[{"role":"user","content":prompt}],
+        temperature=0.5
     )
-    return "🚗 글로벌 자동차/AS 시장\n" + response.choices[0].message.content
+    analysis = response['choices'][0]['message']['content']
+    return f"{analysis}\n\n뉴스 링크:\n" + "\n".join(news_links)
