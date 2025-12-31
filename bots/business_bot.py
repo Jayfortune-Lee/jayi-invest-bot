@@ -1,32 +1,32 @@
 import sys
 import os
 
-# 현재 파일(bots/xxx.py)의 부모 폴더(루트)를 파이썬 경로에 추가합니다.
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+# 현재 파일의 위치를 기준으로 상위 폴더(루트)를 파이썬 경로에 강제로 등록합니다.
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
-# 그 다음에 기존 import문을 둡니다.
-from core.analyzer import ask_gpt
-# ... 나머지 import 생략
-
-
-import os, asyncio
+# 이제 'core'를 확실히 찾을 수 있습니다.
+import asyncio
 import yfinance as yf
 from core.analyzer import ask_gpt
 from telegram import Bot
 
 async def main():
-    # 주요 글로벌 뉴스 키워드 수집 (yfinance 뉴스 활용 및 검색어 조합)
-    sectors = ["Global Supply Chain", "Automotive Logistics", "Port Strike", "Car Parts Shortage"]
+    # 업무 리스크 분석 로직
+    sectors = ["Global Supply Chain", "Automotive Logistics", "Port Strike"]
     news_context = ""
-    for s in sectors:
-        news_context += str(yf.Search(s, max_results=3).news)
+    try:
+        for s in sectors:
+            news_context += str(yf.Search(s, max_results=2).news)
+    except:
+        news_context = "뉴스 데이터를 가져오는 중 오류가 발생했습니다."
 
     prompt = f"""
-    [업무 브리핑 요청] 글로벌 자동차/AS 시장 리스크 분석
-    - 수집 뉴스: {news_context}
-    - 5대 권역(미국, 중국, 유럽, 중동, 멕시코/동남아)별 정세 및 재난/전쟁 리스크 요약.
-    - 특히 OEM 생산 지연이 AS 부품 공급망과 수익성에 미치는 영향 분석.
-    - AS 담당자가 오늘 주목해야 할 실무 행동 가이드 제시.
+    [업무 브리핑] 글로벌 자동차/AS 리스크 분석
+    - 뉴스: {news_context}
+    - 5대 권역별 정세 및 공급망 리스크 요약.
+    - AS 담당자를 위한 실무 가이드.
     """
     report = ask_gpt(prompt)
     bot = Bot(token=os.getenv("TG_TOKEN_MARKET"))
