@@ -1,19 +1,11 @@
-import sys
 import os
-
-# 루트를 Python 모듈 경로에 추가
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from core.auction import get_auction_message
-from telegram_sender import send_telegram_message  # 루트에서 import
+from core.auction import get_auction_brief
+from core.telegram_sender import send_telegram_message
 
 def run_auction_bot():
-    msg = get_auction_message()
-    send_telegram_message(
-        message=msg,
-        token=os.environ["TG_TOKEN_AUCTION"],
-        chat_id=os.environ["TG_ID_AUCTION"]
-    )
+    message = get_auction_brief()
+    chat_id = os.environ.get("TG_ID_AUCTION")
+    send_telegram_message(chat_id, message)
 
 if __name__ == "__main__":
     run_auction_bot()
